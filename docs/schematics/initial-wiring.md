@@ -1,102 +1,91 @@
-\# Initial EMG Prototype Wiring
+﻿# Initial EMG Prototype Wiring
 
-\*\*Status:\*\* Preliminary. Verify the labels on the physical boards before
+> **Status: preliminary**
+>
+> Confirm the labels and pinout on the physical boards before applying power.
+> GPIO1 and GPIO4 are the proposed pins for the first prototype, not a
+> substitute for checking the actual board documentation.
 
-powering the circuit.
+This document describes the first bring-up circuit: one SEN0240 EMG channel,
+one analog input, and one software-controlled activity LED.
 
-\## Components
+## Parts
 
-\- Waveshare ESP32-S3-DEV-KIT-N8R8
+- Waveshare ESP32-S3-DEV-KIT-N8R8
+- DFRobot Gravity SEN0240
+- 830-point solderless breadboard
+- 5 mm LED
+- 330 ohm resistor
+- Dupont wires
+- USB-A to USB-C data cable
 
-\- DFRobot Gravity SEN0240
+## Connection overview
 
-\- 5 mm LED
+```mermaid
+flowchart LR
+    E[Electrodes] --> S[SEN0240<br/>amplifier + filter]
+    S -- SIG --> A[ESP32-S3<br/>GPIO1 / ADC]
+    S -- VCC --> P[ESP32-S3<br/>3V3]
+    S -- GND --> G[Common GND]
+    A --> F[Sampling<br/>calibration + filtering]
+    F --> C[USB first<br/>BLE later]
+    C --> H[Computer<br/>virtual hand]
+    O[ESP32-S3 GPIO4] --> R[330 ohm]
+    R --> L[LED anode<br/>long leg]
+    L --> G
+```
 
-\- 330 ohm resistor
+## Wiring table
 
-\- 830-point breadboard
+### SEN0240 to ESP32-S3
 
-\- Dupont wires
+| SEN0240 | ESP32-S3 | Purpose |
+|---|---|---|
+| `VCC` | `3V3` | Sensor power |
+| `GND` | `GND` | Common reference |
+| `SIG` | `GPIO1` | Analog EMG signal |
 
-\## Electrical connections
+### Activity LED
 
-```text
+| From | Through | To |
+|---|---|---|
+| `GPIO4` | `330 ohm` resistor | LED anode / long leg |
+| LED cathode / short leg | — | `GND` |
 
-SEN0240 VCC  -> ESP32-S3 3V3
+The resistor may be placed on either side of the LED, but it must be in
+series. The LED is driven by firmware from the measured EMG value; do not
+connect it directly to `SEN0240 SIG`.
 
-SEN0240 GND  -> ESP32-S3 GND
+## Breadboard layout
 
-SEN0240 SIG  -> ESP32-S3 GPIO1 (ADC input)
+1. Place the ESP32-S3 across the breadboard center gap.
+2. Use one rail for `3V3` and one rail for common `GND`.
+3. Connect `SEN0240 VCC` and `SIG` to separate rows.
+4. Put the LED legs in separate rows.
+5. Keep the resistor and LED in series.
+6. Before powering on, visually confirm that `3V3` and `GND` are not joined.
 
-ESP32-S3 GPIO4 -> 330 ohm resistor -> LED long leg
+Do not rely on wire colors. Read `VCC`, `GND`, and `SIG` from the labels on the
+actual SEN0240 board.
 
-ESP32-S3 GND  -> LED short leg
+## Bring-up sequence
 
-Signal flow
+1. Upload a basic LED blink program.
+2. Confirm USB communication and serial output.
+3. Connect only the LED circuit and test `GPIO4`.
+4. Power down, connect `SEN0240 VCC`, `GND`, and `SIG`.
+5. Read `GPIO1` over Serial and confirm that ADC values change.
+6. Record the resting signal.
+7. Record the signal during controlled muscle activation.
+8. Add calibration, filtering, and software-based LED activation.
 
+## Safety and electrical limits
 
-
-electrodes
-
-&#x20;   |
-
-&#x20;   v
-
-SEN0240 amplifier and filter
-
-&#x20;   |
-
-&#x20;   v
-
-ESP32-S3 ADC
-
-&#x20;   |
-
-&#x20;   v
-
-sampling, calibration and filtering
-
-&#x20;   |
-
-&#x20;   v
-
-USB or BLE
-
-&#x20;   |
-
-&#x20;   v
-
-computer and virtual hand
-
-Breadboard notes
-
-Put the ESP32-S3 across the breadboard center gap.
-
-Put LED legs in separate rows.
-
-The resistor must be in series with the LED.
-
-Never connect 3V3 and GND to the same row.
-
-Verify the VCC, GND and SIG labels on the SEN0240.
-
-Do not rely only on wire colors.
-
-Test order
-
-Upload a basic LED blink program.
-
-Confirm USB communication.
-
-Connect SEN0240 VCC, GND and SIG.
-
-Read ADC values over Serial.
-
-Measure the resting signal.
-
-Measure the signal during muscle activation.
-
-Add software-based LED activation.
-
-Initial electrode tests should use battery power. The SEN0240 signal must not be connected to a 5 V ESP32 input.
-
+- Use electrodes only on intact skin.
+- Do not place electrodes on the chest or neck.
+- Perform initial electrode tests from battery power.
+- Verify the SEN0240 output voltage before connecting it to the ADC.
+- The sensor signal must never exceed the ESP32-S3 input limit.
+- Do not connect the sensor signal to a 5 V-only input.
+- This prototype is not a medical device and must not be used for diagnosis or
+  treatment.
