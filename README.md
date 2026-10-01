@@ -1,122 +1,117 @@
 # NeuroHand Lab
 
-Projekt badawczo-prototypowy interfejsu neurotechnologicznego do sterowania wirtualną, a docelowo robotyczną ręką.
+An educational and research prototype of a neurotechnology interface for controlling a virtual and, eventually, robotic hand.
 
-## Cel projektu
+## Project goal
 
-Zbudować system, który:
+Build a system that:
 
-1. rejestruje aktywność mięśni za pomocą EMG,
-2. przesyła dane do komputera przewodowo, a później przez BLE,
-3. rozpoznaje proste gesty lub poziom napięcia mięśnia,
-4. steruje wirtualną ręką,
-5. docelowo może sterować prostym mechanizmem robotycznej ręki,
-6. w dalszym etapie może zostać rozszerzony o EEG/BCI.
+1. records muscle activity using EMG;
+2. sends data to a computer over USB and later BLE;
+3. recognizes simple gestures or muscle activation levels;
+4. controls a virtual hand;
+5. eventually controls a simple robotic hand mechanism;
+6. may later be extended with EEG/BCI.
 
-Projekt jest prototypem edukacyjnym i nie jest urządzeniem medycznym.
+This is an educational prototype, not a medical device.
 
-## Aktualny sprzęt
+## Current hardware
 
-| Element | Zastosowanie | Status |
+| Component | Purpose | Status |
 |---|---|---|
-| DFRobot Gravity SEN0240 | Pomiar sygnału EMG | Zamówiony |
-| Waveshare ESP32-S3-DEV-KIT-N8R8 | Odczyt EMG, przetwarzanie i BLE | Zamówiony |
-| Breadboard 830 pól | Tymczasowe prototypowanie połączeń | Zamówiony |
-| Przewody Dupont | Połączenia ESP32, czujnika i LED | Zamówione |
-| Kabel USB-A → USB-C | Programowanie ESP32 i testy z komputerem | Zamówiony |
-| Diody LED 5 mm | Sygnalizacja wykrycia aktywności mięśnia | Zamówione |
-| Rezystory 330 Ω | Ograniczenie prądu diody LED | Zamówione |
+| DFRobot Gravity SEN0240 | EMG signal measurement | Ordered |
+| Waveshare ESP32-S3-DEV-KIT-N8R8 | ADC reading, processing and BLE | Ordered |
+| 830-point breadboard | Temporary prototyping | Ordered |
+| Dupont wires | Connections between the ESP32, sensor and LED | Ordered |
+| USB-A to USB-C cable | Programming and computer tests | Ordered |
+| 5 mm LEDs | Muscle-activity indicator | Ordered |
+| 330 ohm resistors | LED current limiting | Ordered |
 
-Serwomechanizmy i mechanika ręki zostaną dodane dopiero po uruchomieniu i przetestowaniu części EMG.
+Servos and hand mechanics will be added only after the EMG part works reliably.
 
-## Plan rozwoju
+## Roadmap
 
-### Etap 1 — uruchomienie elektroniki
+### Stage 1 — electronics
 
-- [ ] Zaprogramować ESP32-S3.
-- [ ] Potwierdzić komunikację USB z komputerem.
-- [ ] Podłączyć diodę LED przez rezystor 330 Ω.
-- [ ] Potwierdzić sterowanie diodą.
+- [ ] Program the ESP32-S3.
+- [ ] Confirm USB communication.
+- [ ] Connect an LED through a 330 ohm resistor.
+- [ ] Confirm LED control.
+- [ ] Connect the SEN0240.
+- [ ] Read the analog signal.
 
-### Etap 2 — pomiar EMG
+### Stage 2 — EMG analysis
 
-- [ ] Podłączyć SEN0240 do ESP32-S3.
-- [ ] Odczytać sygnał analogowy.
-- [ ] Wyświetlić wartości i wykres sygnału.
-- [ ] Sprawdzić poziom spoczynkowy, zakłócenia i reakcję na napięcie mięśnia.
-- [ ] Opisać bezpieczne rozmieszczenie elektrod.
+- [ ] Record samples to a file.
+- [ ] Plot the signal.
+- [ ] Measure noise and value range.
+- [ ] Add calibration and filtering.
+- [ ] Document electrode placement and safety.
 
-### Etap 3 — wirtualna ręka
+### Stage 3 — virtual hand
 
-- [ ] Przesyłać dane EMG do aplikacji na komputerze.
-- [ ] Zaimplementować sterowanie otwieraniem i zamykaniem dłoni.
-- [ ] Dodać kalibrację dla użytkownika.
-- [ ] Zmierzyć opóźnienie i stabilność działania.
+- [ ] Send EMG data to a computer application.
+- [ ] Control hand opening and closing.
+- [ ] Add user calibration.
+- [ ] Measure latency and stability.
 
-### Etap 4 — komunikacja bezprzewodowa
+### Stage 4 — wireless communication and classification
 
-- [ ] Przesyłać dane EMG przez BLE.
-- [ ] Odbierać dane na komputerze lub telefonie.
-- [ ] Przetestować działanie zasilane z powerbanku.
+- [ ] Send data over BLE.
+- [ ] Collect a repeatable labeled dataset.
+- [ ] Recognize at least two gestures.
+- [ ] Measure accuracy and classification errors.
 
-### Etap 5 — rozpoznawanie gestów
+### Stage 5 — robotic hand
 
-- [ ] Zebrać oznaczone próbki danych.
-- [ ] Wstępnie filtrować i normalizować sygnał.
-- [ ] Rozpoznać co najmniej dwa gesty.
-- [ ] Zmierzyć skuteczność, opóźnienie i powtarzalność.
+- [ ] Choose a mechanism and actuator.
+- [ ] Add a servo or simple gripper.
+- [ ] Limit movement range and force.
+- [ ] Test safely without wearing the mechanism.
 
-### Etap 6 — mechanizm robotycznej ręki
+### Stage 6 — possible EEG extension
 
-- [ ] Zaprojektować lub wybrać prosty chwytak.
-- [ ] Dodać serwomechanizm i osobne zasilanie.
-- [ ] Ograniczyć zakres ruchu i siłę.
-- [ ] Sterować mechanizmem na podstawie sygnału z wirtualnej ręki.
+EEG must use a separate specialized measurement front-end. EEG electrodes must not be connected directly to ESP32 GPIO pins. The ESP32 may later receive and process data from such a module.
 
-### Etap 7 — możliwe rozszerzenie EEG/BCI
-
-EEG będzie osobnym torem pomiarowym. Elektrody EEG nie mogą być podłączone bezpośrednio do GPIO ESP32 — potrzebny jest specjalizowany, niskoszumowy wzmacniacz i przetwornik ADC. ESP32 może później odbierać i przetwarzać dane z takiego modułu.
-
-## Pierwsze połączenie
-
-Połączenie SEN0240 z ESP32-S3:
+## Initial wiring
 
 ```text
-SEN0240 VCC  → 3V3
-SEN0240 GND  → GND
-SEN0240 SIG  → wejście ADC, np. GPIO1
+SEN0240 VCC  -> ESP32-S3 3V3
+SEN0240 GND  -> ESP32-S3 GND
+SEN0240 SIG  -> ADC input, for example GPIO1
 ```
 
 LED:
 
 ```text
-GPIO4 → rezystor 330 Ω → długa nóżka LED
-krótka nóżka LED → GND
+GPIO4 -> 330 ohm resistor -> LED long leg
+LED short leg -> GND
 ```
 
-Przed podłączeniem należy sprawdzić oznaczenia pinów na konkretnych płytkach. Nie należy kierować się wyłącznie kolorami przewodów.
+Check the labels on the actual boards before connecting anything. Do not rely only on wire colors.
 
-## Dokumentacja eksperymentów
+## Experiment documentation
 
-Każdy eksperyment powinien zawierać:
+Each experiment should record:
 
-- datę i wersję kodu,
-- cel testu,
-- schemat lub opis połączeń,
-- użyte ustawienia,
-- wynik i zebrane dane,
-- napotkane problemy,
-- wnioski oraz następny krok.
+- date and code version;
+- hardware and wiring;
+- objective;
+- settings;
+- data, plots or photos;
+- result and problems;
+- conclusion and next step.
 
-## Bezpieczeństwo
+## Safety
 
-- Elektrody stosować wyłącznie na nieuszkodzonej skórze.
-- Nie umieszczać elektrod na klatce piersiowej ani szyi.
-- Pierwsze testy z elektrodami wykonywać przy zasilaniu bateryjnym.
-- Nie podłączać serw do zasilania ESP32.
-- Projekt nie jest certyfikowanym urządzeniem medycznym i nie służy do diagnostyki ani leczenia.
+- Use electrodes only on intact skin.
+- Do not place electrodes on the chest or neck.
+- Perform initial electrode tests using battery power.
+- Do not power servos from the ESP32 3.3 V pin.
+- This project is not a certified medical device and must not be used for diagnosis or treatment.
 
 ## Status
 
-**Status:** przygotowanie pierwszego prototypu EMG  
-**Następny cel:** uruchomić ESP32-S3, LED i odczyt sygnału z SEN0240.
+**Current status:** preparing the first EMG prototype.
+
+**Next goal:** bring up the ESP32-S3, LED and SEN0240 signal reading.
