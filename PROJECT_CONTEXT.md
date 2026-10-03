@@ -13,7 +13,7 @@ README.md
 PROJECT_CONTEXT.md
 ```
 
-There is no firmware, desktop application or schematic file yet. Hardware has been ordered, but wiring should begin only after delivery and after checking the pin labels on the actual boards.
+The first wiring was checked on the bench on 2026-10-03. See `docs/schematics/initial-wiring.md`. Local firmware and a serial viewer exist on the machine and are intentionally not committed yet.
 
 The last local commits are:
 
@@ -35,6 +35,22 @@ EMG -> ESP32-S3 -> USB/BLE -> computer -> virtual hand
 ```
 
 EEG/BCI may be added later. EEG requires a separate specialized measurement front-end; EEG electrodes must never be connected directly to ESP32 GPIO pins.
+
+## Hardware on the bench
+
+Received and connected. The first verified circuit is:
+
+```text
+Gravity cable: red + -> ESP32-S3 3V3
+               black - -> ESP32-S3 GND
+               blue A -> GPIO1
+Round electrode cable -> SEN0240 jack only
+GPIO4 -> 330 ohm -> LED long leg
+LED short leg -> GND
+USB-A to USB-C -> computer
+```
+
+The Waveshare USB-UART appears as a CH343 serial port. `IO4` on the silkscreen is GPIO4. With the module powered and the pads off the skin, GPIO1 rests near 1.5 V. Shorting GPIO1 to ground reads 0, and tying it to 3V3 reads 4095.
 
 ## Ordered hardware
 

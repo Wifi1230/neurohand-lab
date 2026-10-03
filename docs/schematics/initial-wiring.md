@@ -1,10 +1,10 @@
 ﻿# Initial EMG Prototype Wiring
 
-> **Status: preliminary**
+> **Status: verified on the bench, 2026-10-03**
 >
-> Confirm the labels and pinout on the physical boards before applying power.
-> GPIO1 and GPIO4 are the proposed pins for the first prototype, not a
-> substitute for checking the actual board documentation.
+> GPIO1 and GPIO4 were checked on this Waveshare board. `IO4` is GPIO4.
+> The Gravity plug is labeled `A`, `+`, and `-`. On this cable those wires
+> are blue, red, and black.
 
 This document describes the first bring-up circuit: one SEN0240 EMG channel,
 one analog input, and one software-controlled activity LED.
@@ -65,8 +65,39 @@ connect it directly to `SEN0240 SIG`.
 5. Keep the resistor and LED in series.
 6. Before powering on, visually confirm that `3V3` and `GND` are not joined.
 
-Do not rely on wire colors. Read `VCC`, `GND`, and `SIG` from the labels on the
-actual SEN0240 board.
+The ESP32 stays beside the breadboard. Male-female Dupont wires join its pins
+to the board. The LED circuit that blinked is:
+
+| Breadboard | Connection |
+|---|---|
+| `a10` | wire from `IO4` |
+| `b10` to `b15` | 330 ohm resistor, either way around |
+| `c15` | LED long leg |
+| `c20` | LED short leg |
+| `a20` | jumper to the left blue `-` rail |
+| left blue `-` rail, lower half | wire from ESP32 `GND` |
+
+The red `+` rail is unused. The blue rail is split halfway along the board,
+so the LED return and the ESP32 ground wire must share the lower half.
+
+### SEN0240 cables
+
+1. White 3-pin Gravity plug into the module socket. Red to `3V3`, black to ESP32 `GND`, blue to `IO1`.
+2. Round electrode plug into the round jack on the module. The metal pad faces the skin. It never connects to a GPIO pin.
+
+Unplug USB before moving those wires. Connect ground, then `3V3`, then the blue signal, and seat the white plug before power returns. Do not touch the blue signal to `3V3` or `5V` while that plug is in the module.
+
+### Checks that passed
+
+| Test | ADC result |
+|---|---|
+| `IO1` wired to `GND` | 0 |
+| `IO1` wired to `3V3` | 4095 |
+| Blue Gravity wire, from its contact in the white plug to `IO1`, driven by `3V3` | 4095 |
+| Sensor powered, electrodes off the skin | about 1700–1800, spread of a few tens |
+| Finger pressed across the three pads | spread up to about 500 |
+
+A relaxed forearm does not by itself move the reading. The muscle under the pads has to contract. Moving the amplifier or its cable also moves the trace, because the electrode input is sensitive to cable motion.
 
 ## Bring-up sequence
 
